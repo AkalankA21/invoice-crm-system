@@ -1,0 +1,29 @@
+{
+  "name": "invoice-crm-backend",
+  "version": "1.0.0",
+  "description": "Invoice CRM & Payment Tracking System - API",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [
+    "invoice",
+    "crm",
+    "express",
+    "mysql",
+    "sequelize"
+  ],
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.22.5",
+    "pdfkit": "^0.15.2",
+    "sequelize": "^6.37.8"
+  }
+}
