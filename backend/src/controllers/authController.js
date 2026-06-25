@@ -42,14 +42,23 @@ export const register = asyncHandler(async (req, res) => {
     throw new AppError('An account with this email already exists', 400);
   }
 
-  const user = await User.create({
-    name: name.trim(),
-    email: email.trim(),
-    password,
-    role: role === 'user' ? 'user' : 'admin',
-  });
+  try {
+    const user = await User.create({
+      name: name.trim(),
+      email: email.trim(),
+      password,
+      role: role === 'user' ? 'user' : 'admin',
+    });
 
-  sendAuthResponse(user, 201, res);
+    sendAuthResponse(user, 201, res);
+  } catch (error) {
+    console.error('REGISTER ERROR:', error);
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+      stack: error.stack,
+    });
+  }
 });
 
 export const login = asyncHandler(async (req, res) => {
