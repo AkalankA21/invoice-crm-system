@@ -8,10 +8,12 @@ export default (sequelize) =>
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
+        field: 'customer_id',
       },
       name: {
         type: DataTypes.STRING,
         allowNull: false,
+        field: 'full_name',
       },
       email: {
         type: DataTypes.STRING,
@@ -21,7 +23,7 @@ export default (sequelize) =>
         type: DataTypes.STRING,
         allowNull: true,
       },
-      companyName: {
+      company: {
         type: DataTypes.STRING,
         allowNull: true,
       },
@@ -35,7 +37,8 @@ export default (sequelize) =>
       },
       createdById: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
+        field: 'created_by_id',
       },
       isActive: {
         type: DataTypes.BOOLEAN,
@@ -44,6 +47,7 @@ export default (sequelize) =>
     },
     {
       tableName: 'customers',
-      timestamps: true,
+      timestamps: false,
+      underscored: true,
     }
   );
