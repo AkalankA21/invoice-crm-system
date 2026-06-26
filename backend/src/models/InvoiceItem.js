@@ -1,43 +1,42 @@
 import { DataTypes } from 'sequelize';
 
-export default (sequelize) =>
-  sequelize.define(
+export default (sequelize) => {
+  const InvoiceItem = sequelize.define(
     'InvoiceItem',
     {
       id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.INTEGER.UNSIGNED,
         autoIncrement: true,
         primaryKey: true,
-        field: 'item_id',
       },
       invoiceId: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.INTEGER.UNSIGNED,
         allowNull: false,
-        field: 'invoice_id',
       },
       description: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(500),
         allowNull: false,
-        field: 'product_name',
       },
       quantity: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
+        defaultValue: 1,
       },
       unitPrice: {
-        type: DataTypes.DECIMAL(10, 2),
+        type: DataTypes.DECIMAL(12, 2),
         allowNull: false,
-        field: 'unit_price',
+        defaultValue: 0,
       },
       lineTotal: {
         type: DataTypes.DECIMAL(12, 2),
         allowNull: false,
-        field: 'subtotal',
+        defaultValue: 0,
       },
     },
     {
       tableName: 'invoice_items',
-      timestamps: false,
-      underscored: true,
     }
   );
+
+  return InvoiceItem;
+};

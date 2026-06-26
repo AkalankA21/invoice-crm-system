@@ -48,6 +48,7 @@ const loadInvoiceById = async (id, { withSecrets = false } = {}) => {
 
 /**
  * Dashboard analytics using MySQL aggregation (sequelize.fn + GROUP BY).
+ * Replaces the previous MongoDB $facet / $group pipeline.
  */
 export const getDashboardStats = asyncHandler(async (req, res) => {
   const totals = await Invoice.findOne({

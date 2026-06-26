@@ -1,6 +1,12 @@
 import PDFDocument from 'pdfkit';
 import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { companyConfig } from '../config/company.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const defaultLogoPath = path.join(__dirname, '..', 'assets', 'logo.png');
 
 const formatCurrency = (amount) => `LKR ${Number(amount || 0).toFixed(2)}`;
 
@@ -13,13 +19,38 @@ const formatDate = (date) => {
   });
 };
 
-const drawLogo = (doc, x, y) => {
-  const logoWidth = 100;
-  const logoHeight = 60;
+const resolveLogoPath = () => {
+  const configuredLogoPath = companyConfig.logoPath?.trim();
 
-  if (companyConfig.logoPath && fs.existsSync(companyConfig.logoPath)) {
-    doc.image(companyConfig.logoPath, x, y, { width: logoWidth, height: logoHeight, fit: [logoWidth, logoHeight] });
-    return logoHeight + 10;
+  if (configuredLogoPath) {
+    const resolvedPath = path.isAbsolute(configuredLogoPath)
+      ? configuredLogoPath
+      : path.resolve(__dirname, configuredLogoPath);
+
+    if (fs.existsSync(resolvedPath)) {
+      return resolvedPath;
+    }
+  }
+
+  if (fs.existsSync(defaultLogoPath)) {
+    return defaultLogoPath;
+  }
+
+  return '';
+};
+
+const drawLogo = (doc, x, y) => {
+  const logoWidth = 120;
+  const logoHeight = 60;
+  const logoPath = resolveLogoPath();
+
+  if (logoPath) {
+    try {
+      doc.image(logoPath, x, y, { width: logoWidth, height: logoHeight, fit: [logoWidth, logoHeight] });
+      return logoHeight + 10;
+    } catch (error) {
+      console.warn(`Unable to load logo image: ${logoPath}`, error?.message || error);
+    }
   }
 
   doc
@@ -142,17 +173,32 @@ export const generateInvoicePdf = (invoice, customer) => {
       .fillColor('#1a1a1a')
       .text('INVOICE', 400, 45, { align: 'right', width: 145 });
 
+    const contentX = 170;
+    const companyNameY = 45 + 4;
+
+    doc
+      .font('Helvetica-Bold')
+      .fontSize(15)
+      .fillColor('#2b6cb0')
+      .text(companyConfig.name, contentX, companyNameY, { width: 300 });
+
     doc
       .font('Helvetica')
-      .fontSize(10)
+      .fontSize(9)
       .fillColor('#333333')
-      .text(companyConfig.name, 50, 45 + logoBottom)
-      .text(companyConfig.address, 50, doc.y + 2, { width: 250 })
-      .text(`Phone: ${companyConfig.phone}`, 50, doc.y + 2)
-      .text(`Email: ${companyConfig.email}`, 50, doc.y + 2);
+      .text(companyConfig.address, contentX, companyNameY + 20, { width: 260 })
+      .text(`Phone: ${companyConfig.phone}`, contentX, doc.y + 2)
+      .text(`Email: ${companyConfig.email}`, contentX, doc.y + 2);
 
     if (companyConfig.website) {
-      doc.text(`Web: ${companyConfig.website}`, 50, doc.y + 2);
+      const websiteText = `Web: ${companyConfig.website}`;
+      doc
+        .fillColor('#2b6cb0')
+        .text(websiteText, contentX, doc.y + 2, {
+          width: doc.widthOfString(websiteText) + 10,
+          link: companyConfig.website,
+          underline: true,
+        });
     }
 
     const metaY = 45 + logoBottom;

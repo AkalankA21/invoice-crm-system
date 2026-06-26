@@ -1,11 +1,4 @@
 import 'dotenv/config';
-// Temporary debug logs for environment verification
-console.log('DB_ENV DEBUG - beginning server startup');
-console.log('DB_HOST:', process.env.DB_HOST);
-console.log('DB_USER:', process.env.DB_USER);
-console.log('DB_PASSWORD:', process.env.DB_PASSWORD);
-console.log('DB_NAME:', process.env.DB_NAME);
-console.log('JWT_SECRET present:', Boolean(process.env.JWT_SECRET));
 import express from 'express';
 import cors from 'cors';
 import connectDB from './src/config/db.js';
@@ -19,20 +12,9 @@ import { errorHandler, notFound } from './src/middleware/errorMiddleware.js';
 
 const app = express();
 
-const allowedOrigins = [
-  process.env.CLIENT_URL || 'http://localhost:5173',
-  'http://127.0.0.1:5173',
-];
-
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
+    origin: process.env.CLIENT_URL || 'http://localhost:5173',
     credentials: true,
   })
 );

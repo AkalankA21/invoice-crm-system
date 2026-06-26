@@ -1,44 +1,52 @@
 import { DataTypes } from 'sequelize';
 
-export default (sequelize) =>
-  sequelize.define(
+export default (sequelize) => {
+  const Customer = sequelize.define(
     'Customer',
     {
       id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.INTEGER.UNSIGNED,
         autoIncrement: true,
         primaryKey: true,
-        field: 'customer_id',
       },
       name: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(150),
         allowNull: false,
-        field: 'full_name',
-      },
-      email: {
-        type: DataTypes.STRING,
-        allowNull: true,
       },
       phone: {
-        type: DataTypes.STRING,
-        allowNull: true,
+        type: DataTypes.STRING(30),
+        allowNull: false,
       },
-      company: {
-        type: DataTypes.STRING,
+      email: {
+        type: DataTypes.STRING(150),
         allowNull: true,
+        validate: { isEmail: true },
+        set(value) {
+          this.setDataValue('email', value ? value.toLowerCase().trim() : null);
+        },
       },
       address: {
-        type: DataTypes.TEXT,
+        type: DataTypes.JSON,
+        allowNull: true,
+        defaultValue: {
+          street: '',
+          city: '',
+          state: '',
+          postalCode: '',
+          country: 'Sri Lanka',
+        },
+      },
+      company: {
+        type: DataTypes.STRING(150),
         allowNull: true,
       },
       notes: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING(1000),
         allowNull: true,
       },
       createdById: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.INTEGER.UNSIGNED,
         allowNull: true,
-        field: 'created_by_id',
       },
       isActive: {
         type: DataTypes.BOOLEAN,
@@ -47,7 +55,13 @@ export default (sequelize) =>
     },
     {
       tableName: 'customers',
-      timestamps: false,
-      underscored: true,
+      indexes: [
+        { fields: ['name'] },
+        { fields: ['phone'] },
+        { fields: ['email'] },
+      ],
     }
   );
+
+  return Customer;
+};
